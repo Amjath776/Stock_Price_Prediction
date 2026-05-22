@@ -19,6 +19,12 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 # Module-level logger — consistent with other modules in this pipeline
 logger = logging.getLogger(__name__)
 
+# --- Evaluation thresholds ---
+# Named constants for RMSE quality bands; adjust here to change what counts
+# as "excellent" or "acceptable" without touching the if/elif logic below.
+RMSE_EXCELLENT   = 5    # RMSE below this value → model quality is excellent
+RMSE_ACCEPTABLE  = 20   # RMSE below this value → model quality is acceptable
+
 
 def evaluate_model(model, X_test, y_test):
     """
@@ -71,14 +77,15 @@ def evaluate_model(model, X_test, y_test):
         # Additionally log metrics at INFO level for developer visibility
         logger.info("[evaluate] Evaluation complete — RMSE: %.4f | MAE: %.4f", rmse, mae)
 
-        # Qualitative hint in logs to help developers quickly gauge model quality
-        if rmse < 5:
-            logger.info("[evaluate] Model quality: EXCELLENT (RMSE < 5)")
-        elif rmse < 20:
-            logger.info("[evaluate] Model quality: ACCEPTABLE (RMSE between 5 and 20)")
+        # Qualitative hint in logs — uses named threshold constants defined above
+        if rmse < RMSE_EXCELLENT:
+            logger.info("[evaluate] Model quality: EXCELLENT (RMSE < %d)", RMSE_EXCELLENT)
+        elif rmse < RMSE_ACCEPTABLE:
+            logger.info("[evaluate] Model quality: ACCEPTABLE (RMSE between %d and %d)",
+                        RMSE_EXCELLENT, RMSE_ACCEPTABLE)
         else:
-            logger.warning("[evaluate] Model quality: POOR (RMSE >= 20). "
-                           "Consider tuning hyperparameters or adding more features.")
+            logger.warning("[evaluate] Model quality: POOR (RMSE >= %d). "
+                           "Consider tuning hyperparameters or adding more features.", RMSE_ACCEPTABLE)
 
         return predictions
 

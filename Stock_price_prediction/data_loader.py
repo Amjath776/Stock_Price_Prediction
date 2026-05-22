@@ -46,7 +46,7 @@ def load_stock_data(ticker="AAPL", start="2018-01-01", end="2024-01-01"):
 
     try:
         # Fetch raw OHLCV data from Yahoo Finance for the requested date range
-        df = yf.download(ticker, start=start, end=end)
+        df = yf.download(ticker, start=start, end=end, progress=False)
 
         # Guard against an empty download (e.g., invalid ticker or no data
         # available for the requested range) before further processing

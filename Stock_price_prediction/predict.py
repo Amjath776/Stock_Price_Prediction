@@ -32,6 +32,11 @@ logging.basicConfig(
 # Entry-point logger — identifies messages coming from this module
 logger = logging.getLogger(__name__)
 
+# Default stock ticker to run the pipeline against.
+# Change this one constant to switch the entire pipeline to a different stock
+# (e.g. "MSFT", "GOOGL") without editing the function body below.
+DEFAULT_TICKER = "AAPL"
+
 # Pipeline module imports — each handles one stage of the ML workflow
 from data_loader import load_stock_data
 from preprocessing import preprocess_data
@@ -61,9 +66,9 @@ def main():
 
     try:
         # --- Step 1: Data Loading ---
-        # Download historical AAPL prices from Yahoo Finance (2018–2024)
+        # Download historical prices using the DEFAULT_TICKER constant defined above
         logger.info("[main] Step 1/4 — Loading stock data...")
-        df = load_stock_data("AAPL")
+        df = load_stock_data(DEFAULT_TICKER)
         logger.info("[main] Step 1/4 — Data loading complete. Rows fetched: %d", len(df))
 
         # --- Step 2: Preprocessing ---

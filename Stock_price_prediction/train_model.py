@@ -20,6 +20,13 @@ from sklearn.ensemble import RandomForestRegressor
 # Module-level logger — consistent with other modules in this pipeline
 logger = logging.getLogger(__name__)
 
+# --- Hyperparameter constants ---
+# Defining these at module level makes them easy to spot and adjust without
+# touching the function body. Change here and the entire file updates.
+TEST_SIZE    = 0.2   # Fraction of data held out for testing (last 20% by time)
+N_ESTIMATORS = 100   # Number of trees in the Random Forest ensemble
+RANDOM_STATE = 42    # Seed for reproducibility across runs
+
 
 def train_model(X, y):
     """
@@ -58,24 +65,24 @@ def train_model(X, y):
 
     try:
         # --- Train / Test Split ---
-        # Use the last 20% of records as the test set (shuffle=False preserves
+        # Use the last TEST_SIZE fraction as the test set (shuffle=False preserves
         # temporal order — essential for any time-series model)
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, shuffle=False
+            X, y, test_size=TEST_SIZE, shuffle=False
         )
         logger.info("[train_model] Data split — Training samples: %d | Test samples: %d",
                     len(X_train), len(X_test))
 
         # --- Model Instantiation ---
-        # RandomForestRegressor: an ensemble of 100 decision trees that each
+        # RandomForestRegressor: an ensemble of N_ESTIMATORS decision trees that each
         # vote on the predicted price; their average becomes the final prediction.
-        # random_state=42 ensures the same trees are built every run.
+        # RANDOM_STATE ensures the same trees are built every run.
         model = RandomForestRegressor(
-            n_estimators=100,
-            random_state=42
+            n_estimators=N_ESTIMATORS,
+            random_state=RANDOM_STATE
         )
         logger.debug("[train_model] RandomForestRegressor instantiated with "
-                     "n_estimators=100, random_state=42.")
+                     "n_estimators=%d, random_state=%d.", N_ESTIMATORS, RANDOM_STATE)
 
         # --- Training ---
         # model.fit() builds all 100 trees on the training portion of the data

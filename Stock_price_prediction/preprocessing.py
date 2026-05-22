@@ -16,6 +16,11 @@ import logging
 # Module-level logger — consistent with other modules in this pipeline
 logger = logging.getLogger(__name__)
 
+# Ordered list of feature columns used to build the model input matrix.
+# Centralising this here means adding or removing a feature is a single
+# one-line change, with no risk of the list drifting out of sync elsewhere.
+FEATURE_COLS = ["Open", "High", "Low", "Volume", "Return", "MA_5", "MA_10"]
+
 
 def preprocess_data(df):
     """
@@ -88,8 +93,8 @@ def preprocess_data(df):
                     "Remaining rows: %d", rows_dropped, len(df))
 
         # --- Build feature matrix X and target vector y ---
-        # Select only the columns the model will train on
-        X = df[["Open", "High", "Low", "Volume", "Return", "MA_5", "MA_10"]]
+        # Use the module-level FEATURE_COLS constant — single source of truth
+        X = df[FEATURE_COLS]
 
         # ravel() converts to a flat 1-D array, required by scikit-learn regressors
         y = df["Close"].values.ravel()
